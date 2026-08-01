@@ -141,9 +141,41 @@ body.light-mode .navbar.simple-navbar .nav-links li + li::before {
 @media (max-width: 880px) {
     .navbar.simple-navbar {
         margin: 10px;
-        padding: 6px;
+        padding: 8px 10px;
+        border-radius: 22px;
     }
-    .navbar.simple-navbar .nav-links { display: none; }
+
+    .navbar.simple-navbar .nav-inner {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+    }
+
+    .navbar.simple-navbar .logo-link {
+        position: static;
+        left: auto;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .navbar.simple-navbar .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px 8px;
+        width: 100%;
+    }
+
+    .navbar.simple-navbar .nav-links li + li::before {
+        display: none;
+    }
+
+    .navbar.simple-navbar .nav-link {
+        padding: 7px 10px;
+        font-size: 0.84rem;
+    }
 }
 /* Hero Section */
 .hero {
