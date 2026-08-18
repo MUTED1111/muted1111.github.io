@@ -254,3 +254,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 })();
+
+// Avatar: toggle between personal photo and logo with glitch effect
+document.addEventListener('DOMContentLoaded', () => {
+    const avatar = document.getElementById('avatar');
+    if (!avatar) return;
+    const basePhoto = avatar.querySelector('.photo.base');
+    const baseLogo = avatar.querySelector('.logo.base');
+    const slices = avatar.querySelectorAll('.slice');
+
+    const showLogoFor = 4000; // ms the logo stays visible (was 2000)
+    const cycleEvery = 12000; // ms between cycles (was 5000)
+
+    function triggerLogo() {
+        // start glitch slices
+        avatar.classList.add('glitch-active');
+
+        // short delay then reveal logo (gives a pre-glitch flicker)
+        setTimeout(() => {
+            avatar.classList.add('show-logo');
+            if (baseLogo) baseLogo.classList.add('glitch');
+        }, 220);
+
+        // prepare removal timing
+        const removalDuration = 700; // ms for the removal transition (match CSS glitchExit 0.7s)
+
+        // begin removal after logo has been shown for showLogoFor
+        setTimeout(() => {
+            if (baseLogo) baseLogo.classList.remove('glitch');
+            // add removing class to trigger smoother exit animations
+            avatar.classList.add('removing');
+
+            // after removalDuration, fully hide logo and clear removing state
+            setTimeout(() => {
+                avatar.classList.remove('show-logo');
+                avatar.classList.remove('removing');
+            }, removalDuration);
+        }, 220 + showLogoFor);
+
+        // stop glitch-active after removal completes
+        setTimeout(() => {
+            avatar.classList.remove('glitch-active');
+        }, 220 + showLogoFor + removalDuration + 80);
+    }
+
+    // Start a cycle after a small initial delay so page feels natural
+    setTimeout(() => {
+        triggerLogo();
+        setInterval(triggerLogo, cycleEvery);
+    }, 1200);
+});
