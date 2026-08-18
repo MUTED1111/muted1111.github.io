@@ -194,6 +194,177 @@ body.light-mode .navbar.simple-navbar .nav-links li + li::before {
     position: relative;
 }
 
+/* Avatar above hero title: photo that briefly switches to logo with glitch */
+.hero-avatar {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.6rem; /* move avatar down so head isn't cut off */
+    margin-bottom: 1rem;
+}
+
+.avatar {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: inline-block;
+    border: 3px solid rgba(255,255,255,0.04);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    background: rgba(0,0,0,0.15);
+}
+
+.avatar img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%; /* shift image down inside the circle so head is visible */
+    transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease;
+}
+
+.avatar .base { z-index: 1; }
+.avatar .slice.s1 { z-index: 2; }
+.avatar .slice.s2 { z-index: 3; }
+.avatar .logo.base { z-index: 4; }
+.avatar .logo.l1 { z-index: 5; }
+.avatar .logo.l2 { z-index: 6; }
+
+.avatar .logo {
+    opacity: 0;
+    transform: scale(1.02);
+    filter: saturate(0.6) contrast(1.05);
+    object-position: center 50%; /* center logo vertically inside avatar */
+}
+
+.avatar.show-logo .logo {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.avatar.show-logo .photo {
+    opacity: 0;
+    transform: scale(0.98);
+    filter: blur(0.6px) brightness(0.9);
+}
+
+/* Ensure photo slices are fully hidden while logo is shown */
+.avatar.show-logo .photo.slice,
+.avatar.show-logo .photo.base {
+    opacity: 0 !important;
+    visibility: hidden; /* remove small visible edges */
+}
+
+@keyframes glitch {
+    0% { transform: translate(0, 0) skewX(0); clip-path: inset(0 0 0 0); filter: none; }
+    15% { transform: translate(-6px, -3px) skewX(-2deg); clip-path: inset(10% 0 70% 0); filter: hue-rotate(-10deg) contrast(1.1); }
+    30% { transform: translate(8px, 4px) skewX(2deg); clip-path: inset(40% 0 10% 0); filter: hue-rotate(10deg) contrast(1.05); }
+    45% { transform: translate(-4px, 2px) skewX(-1deg); clip-path: inset(20% 0 50% 0); filter: hue-rotate(-20deg) contrast(1.2); }
+    60% { transform: translate(6px, -2px) skewX(1deg); clip-path: inset(0 0 40% 0); filter: hue-rotate(20deg) contrast(1.05); }
+    100% { transform: translate(0,0) skewX(0); clip-path: inset(0 0 0 0); filter: none; }
+}
+
+.glitch {
+    animation: glitch 0.9s linear;
+}
+
+/* Stronger glitch slices */
+.avatar .slice {
+    opacity: 0;
+    mix-blend-mode: normal;
+    pointer-events: none;
+    border-radius: 50%;
+    /* start as a thin horizontal band so it won't fully cover the image */
+    clip-path: inset(42% 0 42% 0);
+}
+
+.avatar.glitch-active .slice {
+    opacity: 0.65; /* semi-transparent so base photo remains visible */
+}
+
+.avatar .slice.s1 {
+    filter: hue-rotate(-8deg) saturate(1.2) contrast(1.05);
+}
+.avatar .slice.s2 {
+    filter: hue-rotate(8deg) saturate(1.1) contrast(1.02);
+}
+
+@keyframes sliceMove1 {
+    0% { transform: translate(0,0); clip-path: inset(0 0 0 0); }
+    25% { transform: translate(-12px,-6px) skewX(-4deg); clip-path: inset(35% 0 55% 0); }
+    50% { transform: translate(10px,8px) skewX(3deg); clip-path: inset(45% 0 45% 0); }
+    75% { transform: translate(-6px,4px) skewX(-2deg); clip-path: inset(30% 0 60% 0); }
+    100% { transform: translate(0,0); clip-path: inset(0 0 0 0); }
+}
+
+@keyframes sliceMove2 {
+    0% { transform: translate(0,0); clip-path: inset(0 0 0 0); }
+    20% { transform: translate(8px,4px) skewX(3deg); clip-path: inset(40% 0 40% 0); }
+    45% { transform: translate(-10px,-5px) skewX(-3deg); clip-path: inset(30% 0 50% 0); }
+    70% { transform: translate(6px,-2px) skewX(2deg); clip-path: inset(50% 0 30% 0); }
+    100% { transform: translate(0,0); clip-path: inset(0 0 0 0); }
+}
+
+.avatar.glitch-active .slice.s1 { animation: sliceMove1 0.9s linear; }
+.avatar.glitch-active .slice.s2 { animation: sliceMove2 0.9s linear; }
+
+.avatar.glitch-active .logo.l1 { animation: sliceMove1 0.9s linear; filter: hue-rotate(30deg) saturate(1.3); }
+.avatar.glitch-active .logo.l2 { animation: sliceMove2 0.9s linear; filter: hue-rotate(-30deg) saturate(1.1); }
+
+/* Logo hide transition: smoother exit and photo reveal */
+.avatar.removing .logo.base,
+.avatar.removing .logo.l1,
+.avatar.removing .logo.l2 {
+    animation: logoExit 0.6s ease forwards;
+}
+
+@keyframes logoExit {
+    0% { opacity: 1; transform: translateY(0) scale(1); filter: none; }
+    40% { transform: translateY(-6px) rotate(-1deg) scale(1.02); opacity: 0.9; filter: hue-rotate(8deg) contrast(1.08) saturate(1.15);} 
+    100% { transform: translateY(10px) scale(0.94); opacity: 0; filter: blur(3px) grayscale(0.6); }
+}
+
+.avatar.removing .photo.base {
+    animation: photoReveal 0.6s ease forwards;
+}
+
+@keyframes photoReveal {
+    0% { opacity: 0; transform: scale(0.98); filter: blur(2px) brightness(0.9); }
+    100% { opacity: 1; transform: scale(1); filter: none; }
+}
+
+.avatar.removing .logo.base,
+.avatar.removing .logo.l1,
+.avatar.removing .logo.l2 {
+    animation: glitchExit 0.7s cubic-bezier(.22,.9,.31,1) forwards;
+}
+
+@keyframes glitchExit {
+    0% { opacity: 1; transform: translateX(0) translateY(0) rotate(0) scale(1); filter: none; clip-path: inset(0 0 0 0); }
+    15% { opacity: 0.95; transform: translateX(-6px) translateY(-3px) rotate(-1deg) scale(1.02); filter: hue-rotate(-6deg) contrast(1.05); clip-path: inset(8% 0 60% 0); }
+    30% { opacity: 0.85; transform: translateX(8px) translateY(4px) rotate(2deg) scale(1.03); filter: hue-rotate(8deg) contrast(1.08); clip-path: inset(40% 0 10% 0); }
+    45% { opacity: 0.6; transform: translateX(-10px) translateY(6px) rotate(-3deg) scale(0.98); filter: hue-rotate(-12deg) blur(1px); clip-path: inset(20% 0 50% 0); }
+    65% { opacity: 0.35; transform: translateX(12px) translateY(-6px) rotate(4deg) scale(0.96); filter: hue-rotate(20deg) blur(2px) grayscale(0.4); clip-path: inset(50% 0 20% 0); }
+    100% { opacity: 0; transform: translateX(24px) translateY(12px) rotate(6deg) scale(0.9); filter: blur(3px) grayscale(0.7); clip-path: inset(100% 0 0 0); }
+}
+
+/* during removing, keep slices subtle: fade them out quickly so they don't cover base */
+.avatar.removing .slice.s1,
+.avatar.removing .slice.s2 {
+    animation: sliceFade 0.45s ease forwards;
+}
+
+@keyframes sliceFade {
+    0% { opacity: 0.65; transform: translateX(0) skewX(0); }
+    100% { opacity: 0; transform: translateX(10px) skewX(2deg); }
+}
+
+@media (max-width: 600px) {
+    .avatar { width: 120px; height: 120px; }
+}
+
 .hero-title {
     font-size: clamp(3rem, 5vw, 4.4rem);
     font-weight: 900;
@@ -728,105 +899,6 @@ body.light-mode .theme-toggle {
     margin-top: 0.35rem;
     font-size: 1.45rem;
 }
-
-.thought {
-    padding: 4rem 2rem 6rem;
-}
-
-.thought .section-header h2 {
-    color: #e8eefc;
-}
-
-.thought .section-header h2::after {
-    background: linear-gradient(90deg, #7ca8ff, #5f79ff);
-}
-
-.thought .section-header p {
-    color: rgba(232, 238, 252, 0.78);
-}
-
-.thought-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.thought-card {
-    display: grid;
-    grid-template-rows: auto auto 1fr;
-    gap: 0.6rem; /* reduce vertical spacing between elements */
-    padding: 1.4rem 1.8rem; /* slightly tighter padding */
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.16);
-    backdrop-filter: blur(10px);
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-}
-
-.thought-card-img {
-    width: 100%;
-    height: auto;
-    max-height: 140px;
-    object-fit: contain;
-    object-position: center;
-    border-radius: 12px;
-    display: block;
-    margin: 0 0 0.6rem; /* smaller gap under image */
-}
-
-.thought-number {
-    display: inline-block;
-    margin-bottom: 0.28rem; /* smaller gap to title */
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #7ca8ff;
-}
-
-.thought-card h3 {
-    margin: 0 0 0.25rem; /* tighten space between title and paragraph */
-    font-size: 1.15rem;
-    color: #e8eefc;
-}
-
-.thought-card p {
-    margin: 0;
-    color: rgba(232, 238, 252, 0.78);
-    line-height: 1.7; /* keep readable */
-}
-
-body.light-mode .thought .section-header h2 {
-    color: #4b7dff;
-}
-
-body.light-mode .thought .section-header p {
-    color: #3a4d71;
-}
-
-body.light-mode .thought-card {
-    background: rgba(138, 191, 255, 0.12);
-    border: 1px solid rgba(138, 191, 255, 0.28);
-    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.08);
-}
-
-body.light-mode .thought-card h3 {
-    color: #1f3251;
-}
-
-body.light-mode .thought-card p {
-    color: #3a4d71;
-}
-
-@media (max-width: 900px) {
-    .thought-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 /* Games carousel styles (append) */
 .games {
     padding: 4rem 2rem 6rem;
@@ -1077,57 +1149,6 @@ body.light-mode .cursor-dot {
     .transition-overlay {
         display: none !important;
     }
-}
-
-.thought .section-header h2 {
-    color: #e8eefc;
-}
-
-.thought .section-header h2::after {
-    background: linear-gradient(90deg, #7ca8ff, #5f79ff);
-}
-
-.thought .section-header p {
-    color: rgba(232, 238, 252, 0.78);
-}
-
-.thought .section-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-.thought .section-header h2 {
-    font-size: clamp(3rem, 4vw, 4.6rem);
-    color: #4b7dff;
-    margin-bottom: 1rem;
-    letter-spacing: -0.05em;
-    line-height: 1.05;
-}
-
-.thought .section-header h2::after {
-    content: '';
-    display: block;
-    width: 110px;
-    height: 4px;
-    margin: 1rem auto 0;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #7ca8ff, #5f79ff);
-}
-
-.thought .section-header p {
-    max-width: 760px;
-    margin: 0 auto;
-    color: rgba(232, 238, 252, 0.78);
-    font-size: 1rem;
-    line-height: 1.8;
-}
-
-body.light-mode .thought .section-header h2 {
-    color: #4b7dff;
-}
-
-body.light-mode .thought .section-header p {
-    color: #3a4d71;
 }
 
 body.light-mode .navbar.simple-navbar {
